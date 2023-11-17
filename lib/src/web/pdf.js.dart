@@ -54,6 +54,7 @@ class PdfjsDocument {
 @JS()
 @anonymous
 class PdfjsPage {
+  // external PdfjsViewport getViewport(double scale);
   external PdfjsViewport getViewport(PdfjsViewportParams params);
 
   /// `viewport` for [PdfjsViewport] and `transform` for

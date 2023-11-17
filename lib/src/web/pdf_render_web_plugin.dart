@@ -103,6 +103,7 @@ class PdfRenderWebPlugin {
       final page =
           await js_util.promiseToFuture<PdfjsPage>(doc.getPage(pageNumber));
       final vp1 = page.getViewport(PdfjsViewportParams(scale: 1));
+      // final vp1 = page.getViewport(1.0);
       return {
         'docId': docId,
         'pageNumber': pageNumber,
@@ -125,7 +126,7 @@ class PdfRenderWebPlugin {
   }
 
   Future<dynamic> _render(dynamic args) async {
-    return await _renderRaw(args, dontFlip: true, handleRawData: (
+    return await _renderRaw(args, dontFlip: false, handleRawData: (
       src,
       x,
       y,
@@ -203,6 +204,8 @@ class PdfRenderWebPlugin {
         offsetX: -x.toDouble(),
         offsetY: -y.toDouble(),
         dontFlip: dontFlip));
+
+    // final vp = page.getViewport(1.0);
 
     final canvas = html.document.createElement('canvas') as html.CanvasElement;
     canvas.width = width;
