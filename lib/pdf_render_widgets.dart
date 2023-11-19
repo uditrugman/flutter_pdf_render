@@ -13,8 +13,7 @@ import 'src/wrappers/pdf_texture.dart';
 /// [pdfDocument] is the PDF document and it is valid until the corresponding
 /// [PdfDocumentLoader] is in the widget tree. It may be null.
 /// [pageCount] indicates the number of pages in it.
-typedef PdfDocumentBuilder = Widget Function(
-    BuildContext context, PdfDocument? pdfDocument, int pageCount);
+typedef PdfDocumentBuilder = Widget Function(BuildContext context, PdfDocument? pdfDocument, int pageCount);
 
 /// Function definition to build widget tree corresponding to a PDF page.
 ///
@@ -24,8 +23,7 @@ typedef PdfDocumentBuilder = Widget Function(
 /// You can determine the final page size shown in the flutter UI using the size
 /// and then pass the size to [textureBuilder] function on the third parameter,
 /// which generates the final [Widget].
-typedef PdfPageBuilder = Widget Function(
-    BuildContext context, PdfPageTextureBuilder textureBuilder, Size pageSize);
+typedef PdfPageBuilder = Widget Function(BuildContext context, PdfPageTextureBuilder textureBuilder, Size pageSize);
 
 /// Function definition to generate the actual widget that contains rendered PDF page image.
 ///
@@ -42,15 +40,10 @@ typedef PdfPageBuilder = Widget Function(
 /// calling `MediaQuery.of(context).devicePixelRatio`.
 /// Please note that on iOS Simulator, it always use non-[Texture] rendering pass.
 typedef PdfPageTextureBuilder = Widget Function(
-    {Size? size,
-    PdfPagePlaceholderBuilder? placeholderBuilder,
-    bool backgroundFill,
-    bool allowAntialiasingIOS,
-    double? renderingPixelRatio});
+    {Size? size, PdfPagePlaceholderBuilder? placeholderBuilder, bool backgroundFill, bool allowAntialiasingIOS, double? renderingPixelRatio});
 
 /// Creates page placeholder that is shown on page loading or even page load failure.
-typedef PdfPagePlaceholderBuilder = Widget Function(
-    Size size, PdfPageStatus status);
+typedef PdfPagePlaceholderBuilder = Widget Function(Size size, PdfPageStatus status);
 
 /// Page loading status.
 enum PdfPageStatus {
@@ -201,8 +194,7 @@ class PdfDocumentLoaderState extends State<PdfDocumentLoader> {
   void _setPageSize(int pageNumber, Size? size) {
     _lastPageSize = size;
     if (pageNumber > 0 && pageNumber <= _doc!.pageCount) {
-      if (_cachedPageSizes == null ||
-          _cachedPageSizes?.length != _doc!.pageCount) {
+      if (_cachedPageSizes == null || _cachedPageSizes?.length != _doc!.pageCount) {
         _cachedPageSizes = List<Size?>.filled(_doc!.pageCount, null);
       }
       _cachedPageSizes![pageNumber - 1] = size;
@@ -211,9 +203,7 @@ class PdfDocumentLoaderState extends State<PdfDocumentLoader> {
 
   Size? _getPageSize(int? pageNumber) {
     Size? size;
-    if (_cachedPageSizes != null &&
-        pageNumber! > 0 &&
-        pageNumber <= _cachedPageSizes!.length) {
+    if (_cachedPageSizes != null && pageNumber! > 0 && pageNumber <= _cachedPageSizes!.length) {
       size = _cachedPageSizes![pageNumber - 1];
     }
     size ??= _lastPageSize;
@@ -286,9 +276,7 @@ class PdfPageView extends StatefulWidget {
   /// Function to build page widget tree. It can be null if you want to use the default page builder.
   final PdfPageBuilder? pageBuilder;
 
-  const PdfPageView(
-      {Key? key, this.pdfDocument, required this.pageNumber, this.pageBuilder})
-      : super(key: key);
+  const PdfPageView({Key? key, this.pdfDocument, required this.pageNumber, this.pageBuilder}) : super(key: key);
 
   @override
   PdfPageViewState createState() => PdfPageViewState();
@@ -312,9 +300,7 @@ class PdfPageViewState extends State<PdfPageView> {
   @override
   void didUpdateWidget(PdfPageView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.pdfDocument != widget.pdfDocument ||
-        oldWidget.pageNumber != widget.pageNumber ||
-        oldWidget.pageBuilder != widget.pageBuilder) {
+    if (oldWidget.pdfDocument != widget.pdfDocument || oldWidget.pageNumber != widget.pageNumber || oldWidget.pageBuilder != widget.pageBuilder) {
       _release();
       _init();
     }
@@ -353,8 +339,7 @@ class PdfPageViewState extends State<PdfPageView> {
     }
   }
 
-  PdfDocumentLoaderState? _getPdfDocumentLoaderState() =>
-      context.findAncestorStateOfType<PdfDocumentLoaderState>();
+  PdfDocumentLoaderState? _getPdfDocumentLoaderState() => context.findAncestorStateOfType<PdfDocumentLoaderState>();
 
   void _release() {
     _doc = null;
@@ -370,16 +355,14 @@ class PdfPageViewState extends State<PdfPageView> {
     return pageBuilder(context, _textureBuilder, _pageSize);
   }
 
-  Widget _pageBuilder(BuildContext context,
-      PdfPageTextureBuilder textureBuilder, Size pageSize) {
+  Widget _pageBuilder(BuildContext context, PdfPageTextureBuilder textureBuilder, Size pageSize) {
     return LayoutBuilder(builder: (context, constraints) => textureBuilder());
   }
 
   Size get _pageSize => _size ?? defaultSize;
 
   Size _sizeFromConstraints(BoxConstraints constraints, Size pageSize) {
-    final ratio = min(constraints.maxWidth / pageSize.width,
-        constraints.maxHeight / pageSize.height);
+    final ratio = min(constraints.maxWidth / pageSize.width, constraints.maxHeight / pageSize.height);
     return Size(pageSize.width * ratio, pageSize.height * ratio);
   }
 
@@ -392,11 +375,7 @@ class PdfPageViewState extends State<PdfPageView> {
   }) {
     return LayoutBuilder(builder: (context, constraints) {
       final finalSize = size ?? _sizeFromConstraints(constraints, _pageSize);
-      final finalPlaceholderBuilder = placeholderBuilder ??
-          (size, status) => Container(
-              width: size.width,
-              height: size.height,
-              color: const Color.fromARGB(255, 220, 220, 220));
+      final finalPlaceholderBuilder = placeholderBuilder ?? (size, status) => Container(width: size.width, height: size.height, color: const Color.fromARGB(255, 220, 220, 220));
       return FutureBuilder<bool>(
           future: _buildTexture(
             size: finalSize,
@@ -407,14 +386,14 @@ class PdfPageViewState extends State<PdfPageView> {
           initialData: false,
           builder: (context, snapshot) {
             if (snapshot.data != true) {
+              print("loading.....");
               // still loading
               return finalPlaceholderBuilder(finalSize, PdfPageStatus.loading);
             }
 
             if (_texture?.texId == null) {
               // some loading error
-              return finalPlaceholderBuilder(
-                  finalSize, PdfPageStatus.loadFailed);
+              return finalPlaceholderBuilder(finalSize, PdfPageStatus.loadFailed);
             }
 
             return SizedBox(
@@ -432,23 +411,15 @@ class PdfPageViewState extends State<PdfPageView> {
     bool allowAntialiasingIOS = true,
     double? renderingPixelRatio,
   }) async {
-    if (_doc == null ||
-        widget.pageNumber == null ||
-        widget.pageNumber! < 1 ||
-        widget.pageNumber! > _doc!.pageCount ||
-        _page == null) {
+    if (_doc == null || widget.pageNumber == null || widget.pageNumber! < 1 || widget.pageNumber! > _doc!.pageCount || _page == null) {
       return true;
     }
 
-    final pixelRatio =
-        renderingPixelRatio ?? MediaQuery.of(context).devicePixelRatio;
+    final pixelRatio = renderingPixelRatio ?? MediaQuery.of(context).devicePixelRatio;
     final pixelSize = size * pixelRatio;
-    if (_texture == null ||
-        _texture!.pdfDocument != _doc ||
-        _texture!.pageNumber != widget.pageNumber) {
+    if (_texture == null || _texture!.pdfDocument != _doc || _texture!.pageNumber != widget.pageNumber) {
       _texture?.dispose();
-      _texture = await PdfPageImageTexture.create(
-          pdfDocument: _doc!, pageNumber: widget.pageNumber!);
+      _texture = await PdfPageImageTexture.create(pdfDocument: _doc!, pageNumber: widget.pageNumber!);
     }
     await _texture!.extractSubrect(
       width: pixelSize.width.toInt(),
@@ -463,10 +434,190 @@ class PdfPageViewState extends State<PdfPageView> {
   }
 }
 
-typedef LayoutPagesFunc = List<Rect> Function(
-    Size contentViewSize, List<Size> pageSizes);
-typedef BuildPageContentFunc = Widget Function(
-    BuildContext context, int pageNumber, Rect pageRect);
+
+// class _IdenticalKey extends LocalKey {
+//   /// Creates a key that delegates its [operator==] to the given value.
+//   const _IdenticalKey(this.value);
+//
+//   /// The value to which this key delegates its [operator==]
+//   final Object value;
+//
+//   @override
+//   bool operator ==(Object other) => other is _IdenticalKey && identical(value, other.value);
+//
+//   @override
+//   int get hashCode => identityHashCode(value);
+//
+//   @override
+//   String toString() => "$value";
+// }
+
+// class PdfPageByPageView extends StatefulWidget {
+//   /// [PdfDocument] to render. If it is null, the actual document is obtained by locating ancestor [PdfDocumentLoader]
+//   /// widget.
+//   final PdfDocument pdfDocument;
+//
+//   // /// Page number of the page to render if only one page should be shown.
+//   // final int? pageNumber;
+//
+//   PdfPage page;
+//
+//   /// Function to build page widget tree. It can be null if you want to use the default page builder.
+//   final PdfPageBuilder? pageBuilder;
+//
+//   PdfPageByPageView({required this.pdfDocument, required this.page, this.pageBuilder}) : super(key: _IdenticalKey(page));
+//
+//   @override
+//   PdfPageViewByPageState createState() => PdfPageViewByPageState();
+// }
+
+// class PdfPageViewByPageState extends State<PdfPageByPageView> {
+//   /// The default size; A4 595x842 px.
+//   static const defaultSize = Size(595, 842);
+//
+//   PdfDocument get _doc => widget.pdfDocument;
+//
+//   PdfPage get _page => widget.page;
+//
+//   Size get _size => Size(_page.width, _page.height);
+//
+//   PdfPageImageTexture? _texture;
+//
+//   @override
+//   void initState() {
+//     print("initState: page:${widget.page.pageNumber}");
+//     super.initState();
+//   }
+//
+//   @override
+//   void didUpdateWidget(PdfPageByPageView oldWidget) {
+//     super.didUpdateWidget(oldWidget);
+//     if (oldWidget.pageBuilder != widget.pageBuilder) {
+//       _release();
+//     }
+//   }
+//
+//   @override
+//   void dispose() {
+//     _release();
+//     super.dispose();
+//   }
+//
+//   // PdfDocumentLoaderState? _getPdfDocumentLoaderState() => context.findAncestorStateOfType<PdfDocumentLoaderState>();
+//
+//   void _release() {
+//     _texture?.dispose();
+//     _texture = null;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final pageBuilder = widget.pageBuilder ?? _pageBuilder;
+//     return pageBuilder(context, _textureBuilder, _pageSize);
+//   }
+//
+//   Widget _pageBuilder(BuildContext context, PdfPageTextureBuilder textureBuilder, Size pageSize) {
+//     return LayoutBuilder(builder: (context, constraints) => textureBuilder());
+//   }
+//
+//   Size get _pageSize => _size;
+//
+//   Size _sizeFromConstraints(BoxConstraints constraints, Size pageSize) {
+//     final ratio = min(constraints.maxWidth / pageSize.width, constraints.maxHeight / pageSize.height);
+//     return Size(pageSize.width * ratio, pageSize.height * ratio);
+//   }
+//
+//   Widget _textureBuilder({
+//     Size? size,
+//     PdfPagePlaceholderBuilder? placeholderBuilder,
+//     bool backgroundFill = true,
+//     bool allowAntialiasingIOS = true,
+//     double? renderingPixelRatio,
+//   }) {
+//     return LayoutBuilder(builder: (context, constraints) {
+//       final finalSize = size ?? _sizeFromConstraints(constraints, _pageSize);
+//       final finalPlaceholderBuilder = placeholderBuilder ?? (size, status) => Container(width: size.width, height: size.height, color: const Color.fromARGB(255, 220, 220, 220));
+//       Future<bool>? future;
+//       if (_texture == null) {
+//         future = _buildTexture(
+//           size: finalSize,
+//           backgroundFill: backgroundFill,
+//           allowAntialiasingIOS: allowAntialiasingIOS,
+//           renderingPixelRatio: renderingPixelRatio,
+//         );
+//       }
+//       return FutureBuilder<bool>(
+//           future: future,
+//           // initialData: future == null,
+//           builder: (context, snapshot) {
+//
+//             if (_texture == null) {
+//             // if (snapshot.data != true) {
+//               print("loading.....");
+//               // still loading
+//               return finalPlaceholderBuilder(finalSize, PdfPageStatus.loading);
+//             }
+//
+//             if (_texture?.texId == null) {
+//               // some loading error
+//               return finalPlaceholderBuilder(finalSize, PdfPageStatus.loadFailed);
+//             }
+//
+//             return SizedBox(
+//               width: finalSize.width,
+//               height: finalSize.height,
+//               child: PdfTexture(textureId: _texture!.texId),
+//             );
+//           });
+//     });
+//   }
+//
+//   static Future<PdfPageImageTexture> __buildTexture({
+//     required PdfDocument doc,
+//     required PdfPage page,
+//     required Size size,
+//     bool backgroundFill = true,
+//     bool allowAntialiasingIOS = true,
+//     required double pixelRatio,
+//   }) async {
+//     final pixelSize = size * pixelRatio;
+//     final texture = await PdfPageImageTexture.create(pdfDocument: doc, pageNumber: page.pageNumber);
+//     await texture.extractSubrect(
+//       width: pixelSize.width.toInt(),
+//       height: pixelSize.height.toInt(),
+//       fullWidth: pixelSize.width,
+//       fullHeight: pixelSize.height,
+//       backgroundFill: backgroundFill,
+//       allowAntialiasingIOS: allowAntialiasingIOS,
+//     );
+//
+//     return texture;
+//   }
+//
+//   Future<bool> _buildTexture({
+//     required Size size,
+//     bool backgroundFill = true,
+//     bool allowAntialiasingIOS = true,
+//     double? renderingPixelRatio,
+//   }) async {
+//     final pixelRatio = renderingPixelRatio ?? MediaQuery.of(context).devicePixelRatio;
+//
+//     _texture?.dispose();
+//     _texture = null;
+//     _texture = await __buildTexture(
+//       doc: _doc,
+//       page: _page,
+//       size: _size,
+//       backgroundFill: backgroundFill,
+//       allowAntialiasingIOS: allowAntialiasingIOS,
+//       pixelRatio: pixelRatio,
+//     );
+//     return true;
+//   }
+// }
+
+typedef LayoutPagesFunc = List<Rect> Function(Size contentViewSize, List<Size> pageSizes);
+typedef BuildPageContentFunc = Widget Function(BuildContext context, int pageNumber, Rect pageRect);
 
 /// Specifies where to anchor to.
 enum PdfViewerAnchor {
@@ -524,8 +675,7 @@ class PdfViewerController extends TransformationController {
   Rect? getPageRect(int pageNumber) => _state!._pages![pageNumber - 1].rect;
 
   /// Get the page.
-  Future<PdfPage> getPage(int pageNumber) =>
-      _state!._pages![pageNumber - 1].pdfPageCompleter.future;
+  Future<PdfPage> getPage(int pageNumber) => _state!._pages![pageNumber - 1].pdfPageCompleter.future;
 
   /// Get the [PdfViewer]'s view size.
   Size get viewSize => _state!._lastViewSize!;
@@ -534,39 +684,29 @@ class PdfViewerController extends TransformationController {
   Size get fullSize => _state!._docSize! * zoomRatio;
 
   /// Get the maximum scrollable offset in the [PdfViewer].
-  Offset get scrollableMax =>
-      Offset(getScrollableMaxX(zoomRatio), getScrollableMaxY(zoomRatio));
+  Offset get scrollableMax => Offset(getScrollableMaxX(zoomRatio), getScrollableMaxY(zoomRatio));
 
   /// Get the full PDF content size in the [PdfViewer] with the specified [zoomRatio].
   Size getFullSize(double zoomRatio) => _state!._docSize! * zoomRatio;
 
   /// Calculate maximum X that can be acceptable as a horizontal scroll position.
-  double getScrollableMaxX(double zoomRatio) =>
-      getFullSize(zoomRatio).width - _state!._lastViewSize!.width;
+  double getScrollableMaxX(double zoomRatio) => getFullSize(zoomRatio).width - _state!._lastViewSize!.width;
 
   /// Calculate maximum Y that can be acceptable as a vertical scroll position.
-  double getScrollableMaxY(double zoomRatio) =>
-      getFullSize(zoomRatio).height - _state!._lastViewSize!.height;
+  double getScrollableMaxY(double zoomRatio) => getFullSize(zoomRatio).height - _state!._lastViewSize!.height;
 
   /// Clamp horizontal scroll position into valid range.
-  double clampX(double x, double zoomRatio) =>
-      x.clamp(0.0, getScrollableMaxX(zoomRatio));
+  double clampX(double x, double zoomRatio) => x.clamp(0.0, getScrollableMaxX(zoomRatio));
 
   /// Clamp vertical scroll position into valid range.
-  double clampY(double y, double zoomRatio) =>
-      y.clamp(0.0, getScrollableMaxY(zoomRatio));
+  double clampY(double y, double zoomRatio) => y.clamp(0.0, getScrollableMaxY(zoomRatio));
 
   /// Calculate the matrix that corresponding to the page position.
   ///
   /// If the page does not exist in the layout, it returns null.
   /// If the controller is not ready([isReady]), the method throws some exception.
   Matrix4? calculatePageFitMatrix({required int pageNumber, double? padding}) =>
-      calculatePageMatrix(
-          pageNumber: pageNumber,
-          padding: padding,
-          x: 0,
-          y: 0,
-          anchor: PdfViewerAnchor.topLeft);
+      calculatePageMatrix(pageNumber: pageNumber, padding: padding, x: 0, y: 0, anchor: PdfViewerAnchor.topLeft);
 
   /// Calculate the matrix that corresponding to the page of specified offset ([x], [y]) and specified [zoomRatio].
   ///
@@ -597,14 +737,8 @@ class PdfViewerController extends TransformationController {
     final ratio = destZoom / zoom1;
     final viewWidth = _state!._lastViewSize!.width;
     final viewHeight = _state!._lastViewSize!.height;
-    final left = clampX(
-        (rect.left + rect.width * x) * ratio -
-            viewWidth * (anchor.index % 3) / 2,
-        destZoom);
-    final top = clampY(
-        (rect.top + rect.height * y) * ratio -
-            viewHeight * (anchor.index ~/ 3) / 2,
-        destZoom);
+    final left = clampX((rect.left + rect.width * x) * ratio - viewWidth * (anchor.index % 3) / 2, destZoom);
+    final top = clampY((rect.top + rect.height * y) * ratio - viewHeight * (anchor.index ~/ 3) / 2, destZoom);
 
     return Matrix4.compose(
       math64.Vector3(-left, -top, 0),
@@ -634,8 +768,7 @@ class PdfViewerController extends TransformationController {
     Duration duration = const Duration(milliseconds: 500),
   }) =>
       goTo(
-        destination:
-            calculatePageFitMatrix(pageNumber: pageNumber, padding: padding),
+        destination: calculatePageFitMatrix(pageNumber: pageNumber, padding: padding),
         duration: duration,
       );
 
@@ -711,8 +844,7 @@ class PdfViewerController extends TransformationController {
   /// Current view rectangle.
   ///
   /// If the controller is not ready([isReady]), the property throws some exception.
-  Rect get viewRect => Rect.fromLTWH(-value.row0[3], -value.row1[3],
-      _state!._lastViewSize!.width, _state!._lastViewSize!.height);
+  Rect get viewRect => Rect.fromLTWH(-value.row0[3], -value.row1[3], _state!._lastViewSize!.width, _state!._lastViewSize!.height);
 
   /// Current view zoom ratio.
   ///
@@ -879,8 +1011,7 @@ class PdfViewerParams {
         onInteractionEnd: onInteractionEnd ?? this.onInteractionEnd,
         onInteractionStart: onInteractionStart ?? this.onInteractionStart,
         onInteractionUpdate: onInteractionUpdate ?? this.onInteractionUpdate,
-        onViewerControllerInitialized:
-            onViewerControllerInitialized ?? this.onViewerControllerInitialized,
+        onViewerControllerInitialized: onViewerControllerInitialized ?? this.onViewerControllerInitialized,
       );
 
   @override
@@ -1089,8 +1220,7 @@ class PdfViewer extends StatefulWidget {
   PdfViewerState createState() => PdfViewerState();
 }
 
-class PdfViewerState extends State<PdfViewer>
-    with SingleTickerProviderStateMixin {
+class PdfViewerState extends State<PdfViewer> with SingleTickerProviderStateMixin {
   PdfDocument? _doc;
   List<_PdfPageState>? _pages;
   final _pendedPageDisposes = <_PdfPageState>[];
@@ -1106,14 +1236,12 @@ class PdfViewerState extends State<PdfViewer>
   bool _firstControllerAttach = true;
   bool _forceUpdatePagePreviews = true;
 
-  PdfViewerController get _controller =>
-      widget.viewerController ?? _myController;
+  PdfViewerController get _controller => widget.viewerController ?? _myController;
 
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 200));
+    _animController = AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
     _init();
   }
 
@@ -1128,8 +1256,7 @@ class PdfViewerState extends State<PdfViewer>
       _init();
     } else {
       widget.params?.onViewerControllerInitialized?.call(_controller);
-      _moveToInitialPositionIfSpecified(
-          oldPageNumber: oldWidget.params?.pageNumber);
+      _moveToInitialPositionIfSpecified(oldPageNumber: oldWidget.params?.pageNumber);
     }
   }
 
@@ -1163,7 +1290,9 @@ class PdfViewerState extends State<PdfViewer>
         for (int i = 0; i < _doc!.pageCount; i++) {
           pages.add(_PdfPageState._(pageNumber: i + 1, pageSize: pageSize1));
         }
-      } catch (e) {/* ignore errors anyway */}
+      } catch (e) {
+        /* ignore errors anyway */
+      }
       _firstControllerAttach = true;
       _pages = pages;
     }
@@ -1210,13 +1339,9 @@ class PdfViewerState extends State<PdfViewer>
           onInteractionUpdate: widget.params?.onInteractionUpdate,
           panEnabled: widget.params?.panEnabled ?? true,
           scaleEnabled: widget.params?.scaleEnabled ?? true,
-          interactionEndFrictionCoefficient:
-              widget.params?.interactionEndFrictionCoefficient ?? 0.0000135,
+          interactionEndFrictionCoefficient: widget.params?.interactionEndFrictionCoefficient ?? 0.0000135,
           child: Stack(
-            children: <Widget>[
-              SizedBox(width: docSize.width, height: docSize.height),
-              ...iterateLaidOutPages(viewSize)
-            ],
+            children: <Widget>[SizedBox(width: docSize.width, height: docSize.height), ...iterateLaidOutPages(viewSize)],
           ),
         );
       },
@@ -1232,10 +1357,8 @@ class PdfViewerState extends State<PdfViewer>
     if (widget.params?.layoutPages == null) {
       _relayoutDefault(viewSize!);
     } else {
-      final contentSize =
-          Size(viewSize!.width - _padding * 2, viewSize.height - _padding * 2);
-      final rects = widget.params!.layoutPages!(
-          contentSize, _pages!.map((p) => p.pageSize).toList());
+      final contentSize = Size(viewSize!.width - _padding * 2, viewSize.height - _padding * 2);
+      final rects = widget.params!.layoutPages!(contentSize, _pages!.map((p) => p.pageSize).toList());
       var allRect = Rect.fromLTWH(0, 0, viewSize.width, viewSize.height);
       for (int i = 0; i < _pages!.length; i++) {
         final rect = rects[i].translate(_padding, _padding);
@@ -1288,8 +1411,7 @@ class PdfViewerState extends State<PdfViewer>
   /// Default page layout logic that layouts pages vertically or horizontally.
   void _relayoutDefault(Size viewSize) {
     if (widget.params?.scrollDirection == Axis.horizontal) {
-      final maxHeight = _pages!.fold<double>(
-          0.0, (maxHeight, page) => max(maxHeight, page.pageSize.height));
+      final maxHeight = _pages!.fold<double>(0.0, (maxHeight, page) => max(maxHeight, page.pageSize.height));
       final ratio = (viewSize.height - _padding * 2) / maxHeight;
       var left = _padding;
       for (int i = 0; i < _pages!.length; i++) {
@@ -1301,8 +1423,7 @@ class PdfViewerState extends State<PdfViewer>
       }
       _docSize = Size(left, viewSize.height);
     } else {
-      final maxWidth = _pages!.fold<double>(
-          0.0, (maxWidth, page) => max(maxWidth, page.pageSize.width));
+      final maxWidth = _pages!.fold<double>(0.0, (maxWidth, page) => max(maxWidth, page.pageSize.width));
       final ratio = (viewSize.width - _padding * 2) / maxWidth;
       var top = _padding;
       for (int i = 0; i < _pages!.length; i++) {
@@ -1320,14 +1441,11 @@ class PdfViewerState extends State<PdfViewer>
     if (!_firstControllerAttach && _pages != null) {
       final m = _controller.value;
       final r = m.row0[0];
-      final exposed =
-          Rect.fromLTWH(-m.row0[3], -m.row1[3], viewSize.width, viewSize.height)
-              .inflate(_padding);
+      final exposed = Rect.fromLTWH(-m.row0[3], -m.row1[3], viewSize.width, viewSize.height).inflate(_padding);
 
       for (final page in _pages!) {
         if (page.rect == null) continue;
-        final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r,
-            page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
+        final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r, page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
         final part = pageRectZoomed.intersect(exposed);
         page.isVisibleInsideView = !part.isEmpty;
         if (!page.isVisibleInsideView) continue;
@@ -1341,23 +1459,14 @@ class PdfViewerState extends State<PdfViewer>
             width: page.rect!.width,
             height: page.rect!.height,
             decoration: widget.params?.pageDecoration ??
-                const BoxDecoration(
-                    color: Color.fromARGB(255, 250, 250, 250),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 4,
-                          offset: Offset(2, 2))
-                    ]),
+                const BoxDecoration(color: Color.fromARGB(255, 250, 250, 250), boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 4, offset: Offset(2, 2))]),
             child: Stack(children: [
               ValueListenableBuilder<int>(
                   valueListenable: page._previewNotifier,
                   builder: (context, value, child) => page.preview != null
-                      ? Positioned.fill(
-                          child: PdfTexture(textureId: page.preview!.texId))
+                      ? Positioned.fill(child: PdfTexture(textureId: page.preview!.texId))
                       : widget.params?.buildPagePlaceholder != null
-                          ? widget.params!.buildPagePlaceholder!(
-                              context, page.pageNumber, page.rect!)
+                          ? widget.params!.buildPagePlaceholder!(context, page.pageNumber, page.rect!)
                           : Container()),
               ValueListenableBuilder<_RealSize?>(
                   valueListenable: page.realSize,
@@ -1369,9 +1478,7 @@ class PdfViewerState extends State<PdfViewer>
                           height: realSize.rect.height,
                           child: PdfTexture(textureId: realSize.texture.texId))
                       : Container()),
-              if (widget.params?.buildPageOverlay != null)
-                widget.params!.buildPageOverlay!(
-                    context, page.pageNumber, page.rect!),
+              if (widget.params?.buildPageOverlay != null) widget.params!.buildPageOverlay!(context, page.pageNumber, page.rect!),
             ]),
           ),
         );
@@ -1386,9 +1493,7 @@ class PdfViewerState extends State<PdfViewer>
     if (_lastViewSize == null || _pages == null) return;
     final m = _controller.value;
     final r = m.row0[0];
-    final exposed = Rect.fromLTWH(
-            -m.row0[3], -m.row1[3], _lastViewSize!.width, _lastViewSize!.height)
-        .inflate(_padding);
+    final exposed = Rect.fromLTWH(-m.row0[3], -m.row1[3], _lastViewSize!.width, _lastViewSize!.height).inflate(_padding);
 
     var pagesToUpdate = 0;
     var changeCount = 0;
@@ -1398,8 +1503,7 @@ class PdfViewerState extends State<PdfViewer>
         page.isVisibleInsideView = false;
         continue;
       }
-      final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r,
-          page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
+      final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r, page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
       final part = pageRectZoomed.intersect(exposed);
       final isVisible = !part.isEmpty;
       if (isVisible) {
@@ -1442,12 +1546,9 @@ class PdfViewerState extends State<PdfViewer>
         if (page.rect == null) continue;
         final m = _controller.value;
         final r = m.row0[0];
-        final exposed = Rect.fromLTWH(-m.row0[3], -m.row1[3],
-                _lastViewSize!.width, _lastViewSize!.height)
-            .inflate(_extraBufferAroundView);
+        final exposed = Rect.fromLTWH(-m.row0[3], -m.row1[3], _lastViewSize!.width, _lastViewSize!.height).inflate(_extraBufferAroundView);
 
-        final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r,
-            page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
+        final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r, page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
         final part = pageRectZoomed.intersect(exposed);
         if (part.isEmpty) continue;
 
@@ -1466,8 +1567,7 @@ class PdfViewerState extends State<PdfViewer>
         if (page.status == _PdfPageLoadingStatus.initialized) {
           page.status = _PdfPageLoadingStatus.pageLoading;
           final pdfPage = await page.pdfPageCompleter.future;
-          page.preview = await PdfPageImageTexture.create(
-              pdfDocument: pdfPage.document, pageNumber: page.pageNumber);
+          page.preview = await PdfPageImageTexture.create(pdfDocument: pdfPage.document, pageNumber: page.pageNumber);
           final w = pdfPage.width; // * 2;
           final h = pdfPage.height; // * 2;
 
@@ -1484,7 +1584,9 @@ class PdfViewerState extends State<PdfViewer>
       }
 
       _needRealSizeOverlayUpdate();
-    } catch (e) {/* ignore errors */}
+    } catch (e) {
+      /* ignore errors */
+    }
   }
 
   void _cancelLastRealSizeUpdate() {
@@ -1494,14 +1596,12 @@ class PdfViewerState extends State<PdfViewer>
     }
   }
 
-  final _realSizeOverlayUpdateBufferDuration =
-      const Duration(milliseconds: 100);
+  final _realSizeOverlayUpdateBufferDuration = const Duration(milliseconds: 100);
 
   void _needRealSizeOverlayUpdate() {
     _cancelLastRealSizeUpdate();
     // Using Timer as cancellable version of [Future.delayed]
-    _realSizeUpdateTimer = Timer(
-        _realSizeOverlayUpdateBufferDuration, () => _updateRealSizeOverlay());
+    _realSizeUpdateTimer = Timer(_realSizeOverlayUpdateBufferDuration, () => _updateRealSizeOverlay());
   }
 
   Future<void> _updateRealSizeOverlay() async {
@@ -1515,16 +1615,13 @@ class PdfViewerState extends State<PdfViewer>
     final dpr = MediaQuery.of(context).devicePixelRatio;
     final m = _controller.value;
     final r = m.row0[0];
-    final exposed = Rect.fromLTWH(
-        -m.row0[3], -m.row1[3], _lastViewSize!.width, _lastViewSize!.height);
+    final exposed = Rect.fromLTWH(-m.row0[3], -m.row1[3], _lastViewSize!.width, _lastViewSize!.height);
     final distBase = max(_lastViewSize!.height, _lastViewSize!.width);
     for (final page in _pages!) {
-      if (page.rect == null ||
-          page.status != _PdfPageLoadingStatus.pageLoaded) {
+      if (page.rect == null || page.status != _PdfPageLoadingStatus.pageLoaded) {
         continue;
       }
-      final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r,
-          page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
+      final pageRectZoomed = Rect.fromLTRB(page.rect!.left * r, page.rect!.top * r, page.rect!.right * r, page.rect!.bottom * r);
       final part = pageRectZoomed.intersect(exposed);
       if (part.isEmpty) {
         final dist = (exposed.center - pageRectZoomed.center).distance;
@@ -1537,21 +1634,16 @@ class PdfViewerState extends State<PdfViewer>
       }
       final fw = pageRectZoomed.width * dpr;
       final fh = pageRectZoomed.height * dpr;
-      if (page.preview?.hasUpdatedTexture == true &&
-          fw <= page.preview!.texWidth! &&
-          fh <= page.preview!.texHeight!) {
+      if (page.preview?.hasUpdatedTexture == true && fw <= page.preview!.texWidth! && fh <= page.preview!.texHeight!) {
         // no real-size overlay needed; use preview
         page.realSize.value = null;
       } else {
         // render real-size overlay
         final offset = part.topLeft - pageRectZoomed.topLeft;
-        final rect = Rect.fromLTWH(
-            offset.dx / r, offset.dy / r, part.width / r, part.height / r);
+        final rect = Rect.fromLTWH(offset.dx / r, offset.dy / r, part.width / r, part.height / r);
 
         final pdfPage = await page.pdfPageCompleter.future;
-        final tex = page._textures[page._textureId++ & 1] ??=
-            await PdfPageImageTexture.create(
-                pdfDocument: pdfPage.document, pageNumber: page.pageNumber);
+        final tex = page._textures[page._textureId++ & 1] ??= await PdfPageImageTexture.create(pdfDocument: pdfPage.document, pageNumber: page.pageNumber);
         final w = (part.width * dpr).toInt();
         final h = (part.height * dpr).toInt();
         await tex.extractSubrect(
@@ -1569,19 +1661,14 @@ class PdfViewerState extends State<PdfViewer>
   }
 
   /// Go to the specified location by the matrix.
-  Future<void> _goTo(
-      {Matrix4? destination,
-      Duration duration = const Duration(milliseconds: 200)}) async {
+  Future<void> _goTo({Matrix4? destination, Duration duration = const Duration(milliseconds: 200)}) async {
     try {
       if (destination == null) return; // do nothing
       _animGoTo?.removeListener(_updateControllerMatrix);
       _animController.reset();
-      _animGoTo = Matrix4Tween(begin: _controller.value, end: destination)
-          .animate(_animController);
+      _animGoTo = Matrix4Tween(begin: _controller.value, end: destination).animate(_animController);
       _animGoTo!.addListener(_updateControllerMatrix);
-      await _animController
-          .animateTo(1.0, duration: duration, curve: Curves.easeInOut)
-          .orCancel;
+      await _animController.animateTo(1.0, duration: duration, curve: Curves.easeInOut).orCancel;
     } on TickerCanceled {
       // expected
     }
