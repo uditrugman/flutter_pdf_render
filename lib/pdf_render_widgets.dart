@@ -386,7 +386,7 @@ class PdfPageViewState extends State<PdfPageView> {
           initialData: false,
           builder: (context, snapshot) {
             if (snapshot.data != true) {
-              print("loading.....");
+              // print("loading.....");
               // still loading
               return finalPlaceholderBuilder(finalSize, PdfPageStatus.loading);
             }
