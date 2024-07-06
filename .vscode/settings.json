@@ -38,5 +38,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll": true,
     "source.organizeImports": true
-  }
+  },
+  "dart.flutterSdkPath": ".fvm/versions/3.22.2"
 }
